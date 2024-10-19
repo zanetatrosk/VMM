@@ -2,43 +2,56 @@ import os
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-from tensorflow import keras
-import pathlib
 
 batch_size = 32
-img_height = 180
-img_width = 180
+IMG_HEIGHT = 160
+IMG_WIDTH = 160
 
-def getPictureRecognition(imgInput: Image):
-    print("TensorFlow version:", tf.__version__)
+CLASSNAMES_PATH = '/home/zaneta/VMM/project/VMM/backend/models/16_dogs_v1_classes.txt'
+MODEL_PATH = '/home/zaneta/VMM/project/VMM/backend/models/16_dogs_v1.keras'
+IMAGE_PATH = 'tmp.jpg'
+
+def getPictureRecognition(imgInput: Image, pickedModel: str):
+    if pickedModel == 'dog':
+        model_path = MODEL_PATH
+    elif pickedModel == 'cat':
+        model_path = 'models/cats_model'
+    else:
+        return 'Invalid model'
+
+    print(f"Using model: {pickedModel} from {model_path}")
     # Define the path to the image and the model
-    model_path = '/home/zaneta/VMM/project/saved_model/dog_model.keras'
-    dataset_dir = os.path.expanduser('~/.keras/datasets/dogs')
     results = []
 
     # load image into file
-    imgInput.save('tmp.jpg')
-    img = keras.preprocessing.image.load_img(
-        os.path.expanduser('tmp.jpg'), target_size=(img_height, img_width)
+    imgInput.save(IMAGE_PATH)
+    
+    classnames = open(CLASSNAMES_PATH).read().splitlines()
+    print(classnames)
+    
+    image = tf.keras.preprocessing.image.load_img(
+        IMAGE_PATH, target_size=(IMG_HEIGHT, IMG_WIDTH)
+    )
+    image_batch = tf.expand_dims(
+        tf.keras.preprocessing.image.img_to_array(image), 0
     )
 
-    img_array = keras.preprocessing.image.img_to_array(img)
-    img_array = tf.expand_dims(img_array, 0)  # Create a batch
+    image_preprocess = tf.keras.preprocessing.image.ImageDataGenerator(
+        rescale=1./255
+    )
+    image_batch = image_preprocess.flow(
+        tf.expand_dims(tf.keras.preprocessing.image.img_to_array(image), 0)
+    )
 
-    # Load your saved model
+    model_path = os.path.expanduser(MODEL_PATH)
     model = tf.keras.models.load_model(model_path)
+    predictions = model.predict(image_batch)
 
-    # Predict the content of the image
-    predictions = model.predict(img_array)
-
-    classnames = os.listdir(dataset_dir)
-    # Get the top 10 predicted classes
     top_10_indices = np.argsort(predictions[0])[-10:][::-1]
     top_10_classes = [(classnames[i], predictions[0][i]) for i in top_10_indices]
 
-    # Display the top 10 predicted classes
     print("Top 10 predicted classes:")
     for class_name, probability in top_10_classes:
-        results.append(f'{class_name}: {probability:.4f}')
+        results.append((class_name, probability))
         print(f'{class_name}: {probability:.4f}')
     return results

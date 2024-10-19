@@ -5,7 +5,7 @@ from rest_framework import status
 from PIL import Image
 
 @api_view(['POST'])
-def recognize_dog_breed(request):
+def recognize_dog_breed(request, model):
     if 'file' not in request.FILES:
         response = Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
         response["Access-Control-Allow-Origin"] = "*"
@@ -19,7 +19,7 @@ def recognize_dog_breed(request):
         response["Access-Control-Allow-Origin"] = "*"
         return response
 
-    results = getPictureRecognition(img)
-    response = Response({"predictions": results}, status=status.HTTP_200_OK)
+    results = getPictureRecognition(img, model)
+    response = Response(results, status=status.HTTP_200_OK)
     response["Access-Control-Allow-Origin"] = "*"
     return response

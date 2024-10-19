@@ -62,10 +62,9 @@ const LoadImage: React.FC = () => {
         }
       );
       console.log("File uploaded successfully:", response.data);
-      setResult(response.data.predictions);
+      setResult(response.data);
       console.log(response.data);
       setLoading(false);
-      document.getElementById("myid")?.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
       console.error("Error uploading file:", error);
       setLoading(false);
@@ -164,8 +163,8 @@ const LoadImage: React.FC = () => {
                 <TableBody>
                   {result.map((item, index) => (
                     <TableRow>
-                      <TableCell key={index}>{item.split(":")[0]}</TableCell>
-                      <TableCell key={index}>{item.split(":")[1]}</TableCell>
+                      <TableCell key={index}>{item[0]}</TableCell>
+                      <TableCell key={index}>{item[1]}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
