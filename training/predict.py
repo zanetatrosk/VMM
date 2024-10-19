@@ -8,14 +8,14 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 # Path to the saved keras model
-MODEL_PATH = './saved_models/16_dogs_1_054.keras'
+MODEL_PATH = '/home/zaneta/VMM/project/VMM/backend/models/16_dogs_v1.keras'
 
 # Image dimensions for the model
 IMG_HEIGHT = 160
 IMG_WIDTH = 160
 
 # Path to the class names file, one class per line
-CLASSNAMES_PATH = './class_names.txt'
+CLASSNAMES_PATH = '/home/zaneta/VMM/project/VMM/backend/models/16_dogs_v1_classes.txt'
 
 # Path to the image to predict
 IMAGE_PATH = sys.argv[1]

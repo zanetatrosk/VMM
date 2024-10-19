@@ -53,7 +53,7 @@ const LoadImage: React.FC = () => {
     formData.append("file", selectedFile);
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/recognize-dog-breed",
+        "http://127.0.0.1:8000/recognize-dog-breed/" + model,
         formData,
         {
           headers: {
@@ -110,8 +110,8 @@ const LoadImage: React.FC = () => {
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
                 >
-                  <MenuItem value="mobilenet">MobileNet</MenuItem>
-                  <MenuItem value="resnet">ResNet</MenuItem>
+                  <MenuItem value="dog">Dog</MenuItem>
+                  <MenuItem value="mouse">Mouse</MenuItem>
                 </TextField>
               </Box>
               <Button
@@ -125,7 +125,7 @@ const LoadImage: React.FC = () => {
               </Button>
             </Card>
           </>
-        {loading && <CircularProgress sx={{ marginTop: 5 }}/>}
+        {loading && <><CircularProgress sx={{ marginTop: 5, marginBottom: 2 }}/> <Typography variant="body1">Getting result</Typography></>}
       </Box>
       <Box display={"flex"}>
         {preview && !loading && (
