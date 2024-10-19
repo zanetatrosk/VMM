@@ -28,6 +28,7 @@ const LoadImage: React.FC = () => {
   const [model, setModel] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setResult(null);
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
@@ -73,62 +74,81 @@ const LoadImage: React.FC = () => {
 
   return (
     <>
-      <Box display="flex" flexDirection="column" alignItems="center" p={2} mt={3}>
-        {!loading ? (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        p={2}
+        mt={3}
+      >
           <>
-          <Card sx={{ width: '100%', padding: 2, display: "flex", flexDirection: "column", rowGap: 2 }}>
-            <Typography variant="h5" >
-              Upload Image
-            </Typography>
-            <Box display={"flex"} justifyContent={"space-between"} flexDirection={"column-reverse"} width={"100%"} rowGap={2}>
-              <TextField
-                type="file"
-                onChange={handleFileChange}
-                inputProps={{ accept: "image/*" }}
-              />
-              <TextField
-              select
-              label="Model"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              >
-                <MenuItem value="mobilenet">MobileNet</MenuItem>
-                <MenuItem value="resnet">ResNet</MenuItem>
-              </TextField>
-            </Box>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleUpload}
-              disabled={!selectedFile}
-              sx={{ mt: 2 }}
+            <Card
+              sx={{
+                width: "100%",
+                padding: 2,
+                display: "flex",
+                flexDirection: "column",
+                rowGap: 2,
+              }}
             >
-              Upload
-            </Button>
-          </Card>
-          {preview && (
-              <Box mt={2}>
-                <img
-                  src={preview}
-                  alt="Preview"
-                  style={{ maxWidth: "100%", maxHeight: "40rem" }}
+              <Typography variant="h5">Upload Image</Typography>
+              <Box
+                display={"flex"}
+                justifyContent={"space-between"}
+                flexDirection={"column-reverse"}
+                width={"100%"}
+                rowGap={2}
+              >
+                <TextField
+                  type="file"
+                  onChange={handleFileChange}
+                  inputProps={{ accept: "image/*" }}
                 />
+                <TextField
+                  select
+                  label="Model"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                >
+                  <MenuItem value="mobilenet">MobileNet</MenuItem>
+                  <MenuItem value="resnet">ResNet</MenuItem>
+                </TextField>
               </Box>
-            )}
-            
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleUpload}
+                disabled={!selectedFile || !model || loading}
+                sx={{ mt: 2 }}
+              >
+                Upload
+              </Button>
+            </Card>
           </>
-        ) : (
-          <CircularProgress />
-        )}
+        {loading && <CircularProgress sx={{ marginTop: 5 }}/>}
       </Box>
-      <Box>
+      <Box display={"flex"}>
+        {preview && !loading && (
+          <Box mt={2} display={"flex"} flexDirection={"column"} alignItems={"center"} width={"100%"}>
+            <Typography variant="h5" gutterBottom>
+              Preview
+            </Typography>
+            <img
+              src={preview}
+              alt="Preview"
+              style={{ maxHeight: "40rem", maxWidth: "40rem" }}
+            />
+          </Box>
+        )}
         {result && (
           <Box
             display="flex"
             flexDirection="column"
             alignItems="center"
             p={2}
+            pr={0}
             id="myid"
+            width={"100%"}
           >
             <Typography variant="h5" gutterBottom>
               Result
