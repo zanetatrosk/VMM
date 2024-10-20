@@ -17,7 +17,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import models, { Model, parseBreed } from "./models";
-import { parse } from "path";
 
 const LoadImage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
