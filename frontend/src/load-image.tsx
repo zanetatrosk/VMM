@@ -12,20 +12,19 @@ import {
   TableBody,
   TableRow,
   Paper,
-  Select,
   MenuItem,
-  FormControl,
-  InputLabel,
   Card,
 } from "@mui/material";
 import axios from "axios";
+import models, { Model, parseBreed } from "./models";
+import { parse } from "path";
 
 const LoadImage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<string[] | null>(null);
-  const [model, setModel] = useState<string | null>(null);
+  const [model, setModel] = useState<Model | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setResult(null);
@@ -49,11 +48,12 @@ const LoadImage: React.FC = () => {
   const handleUpload = async () => {
     if (!selectedFile) return;
     setLoading(true);
+    setResult(null);
     const formData = new FormData();
     formData.append("file", selectedFile);
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/recognize-dog-breed/" + model,
+        "http://127.0.0.1:8000/recognize-dog-breed/" + model?.value,
         formData,
         {
           headers: {
@@ -77,58 +77,85 @@ const LoadImage: React.FC = () => {
         display="flex"
         flexDirection="column"
         alignItems="center"
-        p={2}
+        py={2}
         mt={3}
+        width={"100%"}
       >
-          <>
-            <Card
-              sx={{
-                width: "100%",
-                padding: 2,
-                display: "flex",
-                flexDirection: "column",
-                rowGap: 2,
-              }}
+        <>
+          <Card
+            sx={{
+              width: "100%",
+              padding: 2,
+              display: "flex",
+              flexDirection: "column",
+              rowGap: 2,
+              mx: "auto",
+            }}
+          >
+            <Typography variant="h5">Upload Image</Typography>
+            <Box
+              display={"flex"}
+              justifyContent={"space-between"}
+              flexDirection={"column-reverse"}
+              width={"100%"}
+              rowGap={2}
             >
-              <Typography variant="h5">Upload Image</Typography>
-              <Box
-                display={"flex"}
-                justifyContent={"space-between"}
-                flexDirection={"column-reverse"}
-                width={"100%"}
-                rowGap={2}
+              <TextField
+                type="file"
+                onChange={handleFileChange}
+                inputProps={{ accept: "image/*" }}
+              />
+              {model && (
+                <Typography>
+                  Dog breeds that are recognized by the model:{" "}
+                  {model.breeds.map((breed) => parseBreed(breed)).join(", ")}
+                </Typography>
+              )}
+              <TextField
+                select
+                label="Model"
+                value={model?.value || ""}
+                onChange={(event) => {
+                  const selectedModel = models.find(
+                    (model) => model.value === event.target.value
+                  );
+                  setModel(selectedModel || null);
+                }}
               >
-                <TextField
-                  type="file"
-                  onChange={handleFileChange}
-                  inputProps={{ accept: "image/*" }}
-                />
-                <TextField
-                  select
-                  label="Model"
-                  value={model}
-                  onChange={(e) => setModel(e.target.value)}
-                >
-                  <MenuItem value="dog">Dog</MenuItem>
-                  <MenuItem value="mouse">Mouse</MenuItem>
-                </TextField>
-              </Box>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleUpload}
-                disabled={!selectedFile || !model || loading}
-                sx={{ mt: 2 }}
-              >
-                Upload
-              </Button>
-            </Card>
+                {models.map((model) => (
+                  <MenuItem key={model.value} value={model.value}>
+                    {model.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleUpload}
+              disabled={!selectedFile || !model || loading}
+              sx={{ mt: 2 }}
+            >
+              Upload
+            </Button>
+          </Card>
+        </>
+        {loading && (
+          <>
+            <CircularProgress sx={{ marginTop: 5, marginBottom: 2 }} />{" "}
+            <Typography variant="body1">Getting result</Typography>
           </>
-        {loading && <><CircularProgress sx={{ marginTop: 5, marginBottom: 2 }}/> <Typography variant="body1">Getting result</Typography></>}
+        )}
       </Box>
       <Box display={"flex"}>
         {preview && !loading && (
-          <Box mt={2} display={"flex"} flexDirection={"column"} alignItems={"center"} width={"100%"}>
+          <Box
+            mt={2}
+            display={"flex"}
+            flexDirection={"column"}
+            alignItems={"center"}
+            width={"100%"}
+          >
             <Typography variant="h5" gutterBottom>
               Preview
             </Typography>
@@ -157,14 +184,16 @@ const LoadImage: React.FC = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Breed</TableCell>
-                    <TableCell>Probability</TableCell>
+                    <TableCell align="right">Probability</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {result.map((item, index) => (
-                    <TableRow>
-                      <TableCell key={index}>{item[0]}</TableCell>
-                      <TableCell key={index}>{item[1]}</TableCell>
+                  {result.map((item) => (
+                    <TableRow key={item[0]}>
+                      <TableCell>{parseBreed(item[0])}</TableCell>
+                      <TableCell align="right">
+                        {parseFloat(item[1]).toPrecision(2)}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
