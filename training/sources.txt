@@ -1,0 +1,4 @@
+https://www.kaggle.com/datasets/aseemdandgaval/23-pet-breeds-image-classification
+https://www.kaggle.com/datasets/tanlikesmath/the-oxfordiiit-pet-dataset
+https://www.kaggle.com/datasets/gpiosenka/70-dog-breedsimage-data-set
+https://www.kaggle.com/datasets/jessicali9530/stanford-dogs-dataset
