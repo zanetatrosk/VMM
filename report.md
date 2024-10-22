@@ -6,7 +6,7 @@ Téma: Zpracování dat s využitím neuronových sítí
 
 ## Popis projektu
 
-V rámci projektu byla vytvořena webová aplikace pro klasifikaci psího plemene z fotografie, která využívá konvoluční neuronovou síť implementovanou pomocí frameworku Keras/TensorFlow v jazyce Python. Aplikace pak pro používá backendovou část Python framework Django a pro frontendovou část framework React s jazykem TypeScript. Uživatel tak nahraje fotografii psa a aplikace vyhodnotí plemeno, kterému je pes na fotografii vlastnostmi nejpodobnější.
+V rámci projektu byla vytvořena webová aplikace pro klasifikaci psího plemene z fotografie, která využívá konvoluční neuronovou síť implementovanou pomocí frameworku Keras/TensorFlow v jazyce Python. Aplikace pak pro používá backendovou část Python framework Django a pro frontendovou část framework React s jazykem TypeScript. Uživatel tak nahraje fotografii psa a vybere model který chce k rozpoznání využit. Aplikace poté pomocí zvoleného modelu vyhodnotí plemeno, kterému je pes na fotografii vlastnostmi nejpodobnější.
 
 ## Způsob řešení
 
@@ -44,8 +44,23 @@ Pro celý proces trénování modelu byl vytvořen skript train.py. Ten provád�
 Skript je napsán tak, že veškeré konfigurace se provádí nastavením konstant na začátku souboru. Dataset je koncipován tak, že v uvedené složce se očekává jedna podsložka pro každou klasifikační třídu, která obsahuje všechny fotografie do ní spadající. Složka pro uložení modelu pouze musí existovat a je do ní uložen výsledný model a seznam tříd. Ostatní parametry jsou číselné a je možné je měnit dle potřeby. Dále se předáním argumentu plot při spouštění skriptu (tedy např. python train.py plot) vyvolá interaktivní vykreslení grafů (viz popis výše).
 
 ### Webová aplikace
+#### Instalace a spuštění webové aplikace
+Pro spuštění backend části webové aplikace je potřeba mít nainstalovaný Python(3.8.10) a doinstalovat framework Django a další potřebné knihovny (Numpy, TensorFlow, Keras, Django REST framework, Pillow).
+Spuštění backend části aplikace se provede příkazem `python manage.py runserver`.
 
+Pro spuštění frontend části webové aplikace je potřeba mít nainstalovaný Node.js (18 a vyšší) a doinstalovat React a další potřebné knihovny příkazem `npm install`. Následné spuštění frontend části aplikace se provede příkazem `npm start`. Aplikace bude dostupná na adrese `http://localhost:3000`.
 
+Po spuštění aplikace se objeví formulář, kde má uživatel možnost nahrát obrázek psa a pole s vybráním modelu, který bude použit na rozpoznání plemene. 
+Aplikace nabízí následující modely:
+- 16 breeds model - model, který byl trénován na 16 plemenech psů, má přesnost na cca 50%.
+- TODO
+
+Po vybrání konkrétního modelu se uživateli zobrazí seznam plemen, které model rozpoznává.
+Po stisknutí tlačítka "Upload" se u6ivateli zobrazí výsledek v podobě tabulky 10 nejpravděpodobnějších plemen psů, které by mohlo být na obrázku seřazených sestupně podle pravděpodobnosti.
+
+####  Příklad ukázky aplikace
+Na obrázku je vidět ukázka webové aplikace, kde byl nahrán obrázek psa a vybrán model 16 breeds model. Aplikace vrátila tabulku s 10 nejpravděpodobnějšími plemeny psů, které by mohlo být na obrázku. Aplikace správně určila, že na obrázku je pes plemene Golden Retriever.(ikdyž jen s pravděpodobností 27%).
+![Dog Breed Classifier](example.png)
 
 ## Experimentace
 

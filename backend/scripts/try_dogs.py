@@ -7,8 +7,10 @@ batch_size = 32
 IMG_HEIGHT = 160
 IMG_WIDTH = 160
 
-CLASSNAMES_PATH = '/home/zaneta/VMM/project/VMM/backend/models/16_dogs_v1_classes.txt'
-MODEL_PATH = '/home/zaneta/VMM/project/VMM/backend/models/16_dogs_v1.keras'
+
+
+CLASSNAMES_PATH = './models/16_dogs_v1_classes.txt'
+MODEL_PATH = './models/16_dogs_v1.keras'
 IMAGE_PATH = 'tmp.jpg'
 
 def getPictureRecognition(imgInput: Image, pickedModel: str):
@@ -18,15 +20,14 @@ def getPictureRecognition(imgInput: Image, pickedModel: str):
         model_path = 'models/cats_model'
     else:
         return 'Invalid model'
-
-    print(f"Using model: {pickedModel} from {model_path}")
+        
     # Define the path to the image and the model
     results = []
 
     # load image into file
     imgInput.save(IMAGE_PATH)
     
-    classnames = open(CLASSNAMES_PATH).read().splitlines()
+    classnames = open(os.path.expanduser(CLASSNAMES_PATH)).read().splitlines()
     print(classnames)
     
     image = tf.keras.preprocessing.image.load_img(
