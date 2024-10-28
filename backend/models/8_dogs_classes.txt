@@ -1,0 +1,8 @@
+beagle
+boxer
+golden_retriever
+husky
+poodle
+pug
+rottweiler
+yorkshire_terrier

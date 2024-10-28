@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 # Input and output paths
 DATASET_PATH = './dog_breed_dataset'
 MODEL_SAVE_PATH = '../backend/models/'
-MODEL_SAVE_NAME = '16_dogs_test'
+MODEL_SAVE_NAME = '8_dogs_tmp'
 
 # Dataset selection and processing parameters
-SEED = 56
+SEED = 98756
 IMG_HEIGHT = 160
 IMG_WIDTH = 160
 VALIDATION_RATIO = 0.2
@@ -23,7 +23,7 @@ DROPOUT_RATE = 0.2
 # Training parameters
 LEARNING_RATE = 0.001
 MAX_EPOCHS = 10000
-PATIENCE_EPOCHS_STOP = 8
+PATIENCE_EPOCHS_STOP = 5
 PATIENCE_EPOCHS_REDUCE_LR = 3
 
 ### Dataset loading and preprocessing ###
@@ -69,7 +69,7 @@ print('Number of training samples:', train_set.samples)
 print('Number of validation samples:', valid_set.samples)
 
 ### Saving the class names to a file ###
-with open(MODEL_SAVE_PATH + MODEL_SAVE_NAME + '_classes.txt', 'x') as f:
+with open(MODEL_SAVE_PATH + MODEL_SAVE_NAME + '_classes.txt', 'w') as f:
     for class_name in class_names:
         f.write(class_name + '\n')
 
@@ -87,17 +87,17 @@ if len(sys.argv) > 1 and sys.argv[1] == 'plot':
 ### Model definition and training ###
 model = tf.keras.models.Sequential([
     tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
+    tf.keras.layers.Conv2D(32, 3, padding="same", activation="relu"),
+    tf.keras.layers.MaxPooling2D(),
+    tf.keras.layers.Conv2D(32, 3, padding="same", activation="relu"),
+    tf.keras.layers.MaxPooling2D(),
     tf.keras.layers.Conv2D(64, 3, padding="same", activation="relu"),
     tf.keras.layers.MaxPooling2D(),
-    tf.keras.layers.Conv2D(128, 3, padding="same", activation="relu"),
-    tf.keras.layers.MaxPooling2D(),
-    tf.keras.layers.Conv2D(256, 3, padding="same", activation="relu"),
+    tf.keras.layers.Conv2D(64, 3, padding="same", activation="relu"),
     tf.keras.layers.MaxPooling2D(),
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dropout(DROPOUT_RATE),
-    tf.keras.layers.Dense(128, activation="relu"),
     tf.keras.layers.Dense(64, activation="relu"),
-    tf.keras.layers.Dropout(DROPOUT_RATE),
     tf.keras.layers.Dense(32, activation="relu"),
     tf.keras.layers.Dense(n_classes, activation="softmax")
 ])

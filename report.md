@@ -44,9 +44,10 @@ Pro celý proces trénování modelu byl vytvořen skript train.py. Ten provád�
 Skript je napsán tak, že veškeré konfigurace se provádí nastavením konstant na začátku souboru. Dataset je koncipován tak, že v uvedené složce se očekává jedna podsložka pro každou klasifikační třídu, která obsahuje všechny fotografie do ní spadající. Složka pro uložení modelu pouze musí existovat a je do ní uložen výsledný model a seznam tříd. Ostatní parametry jsou číselné a je možné je měnit dle potřeby. Dále se předáním argumentu plot při spouštění skriptu (tedy např. python train.py plot) vyvolá interaktivní vykreslení grafů (viz popis výše).
 
 ### Webová aplikace
+
 #### Instalace a spuštění webové aplikace
-Pro spuštění backend části webové aplikace je potřeba mít nainstalovaný Python(3.8.10) a doinstalovat framework Django a další potřebné knihovny (Numpy, TensorFlow, Keras, Django REST framework, Pillow).
-Spuštění backend části aplikace se provede příkazem `python manage.py runserver`.
+
+Pro spuštění backend části webové aplikace je potřeba mít nainstalovaný Python(3.8.10) a doinstalovat framework Django a další potřebné knihovny (Numpy, TensorFlow, Keras, Django REST framework, Pillow). Spuštění backend části aplikace se provede příkazem `python manage.py runserver`.
 
 Pro spuštění frontend části webové aplikace je potřeba mít nainstalovaný Node.js (18 a vyšší) a doinstalovat React a další potřebné knihovny příkazem `npm install`. Následné spuštění frontend části aplikace se provede příkazem `npm start`. Aplikace bude dostupná na adrese `http://localhost:3000`.
 
@@ -58,13 +59,43 @@ Aplikace nabízí následující modely:
 Po vybrání konkrétního modelu se uživateli zobrazí seznam plemen, které model rozpoznává.
 Po stisknutí tlačítka "Upload" se u6ivateli zobrazí výsledek v podobě tabulky 10 nejpravděpodobnějších plemen psů, které by mohlo být na obrázku seřazených sestupně podle pravděpodobnosti.
 
-####  Příklad ukázky aplikace
-Na obrázku je vidět ukázka webové aplikace, kde byl nahrán obrázek psa a vybrán model 16 breeds model. Aplikace vrátila tabulku s 10 nejpravděpodobnějšími plemeny psů, které by mohlo být na obrázku. Aplikace správně určila, že na obrázku je pes plemene Golden Retriever.(ikdyž jen s pravděpodobností 27%).
+#### Ukázka aplikace
+
+Na obrázku je vidět ukázka webové aplikace, kde byl nahrán obrázek psa a vybrán model 16 breeds model. Aplikace vrátila tabulku s 10 nejpravděpodobnějšími plemeny psů, které by mohlo být na obrázku. Aplikace správně určila, že na obrázku je pes plemene Golden Retriever (i když jen s pravděpodobností 27%).
+
 ![Dog Breed Classifier](example.png)
 
 ## Experimentace
 
-TODO
+V následující 
+
+16 plemen ()
+
+| Velikost obrázků | Konvoluční vrstvy (počty filtrů) | Skryté vrstvy (počty neuronů) | Validační přesnost |
+|---|---|---|---|
+| 224x224 | 64-128-256 | Do-64 | 0.439 |
+| 224x224 | 64-128-256 | Do-64-32 | 0.438 |
+| 224x224 | 64-128-256 | Do-128-64-32 | 0.412 |
+| 224x224 | 64-128-256 | Do-128-64-Do-32 | 0.423 | <- saved magicky vytvořený model s 0.56 přesností (velikost 160x160)
+| 224x224 | 64-128-256 | Do-256-128-Do-64-32 | 0.381 |
+| 224x224 | 64-128-256 | Do-512-256-Do-128-64-32 | 0.436 |
+
+| 160x160 | 
+
+| 224x224 | 16-32-64 | Do-64-32 | 0.435 |
+
+8 plemen (beagle, boxer, golden_retriever, husky, poodle, pug, rottweiler, yorkshire_terrier)
+
+| Velikost obrázků | Konvoluční vrstvy (počty filtrů) | Skryté vrstvy (počty neuronů) | Validační přesnost |
+|---|---|---|---|
+| 160x160 | 16-32-32 | Do-32 | 0.565 |
+| 160x160 | 16-32-32 | Do-64-32 | 0.576 | <- saved
+| 160x160 | 32-64-128 | Do-64-32 | 0.580 |
+| 160x160 | 16-32-32 | Do-128-96 | 0.550 |
+| 160x160 | 16-32-32 | Do-16 | 0.395 |
+| 224x224 | 16-32-32 | Do-64-32 | 0.567 |
+| 160x160 | 16-32-32 | Do-30-18-12 | 0.470 |
+| 160x160 | 32-32-64-64 | Do-64-32 | 0.611 | <- saved as v2
 
 ## Diskuse a závěr
 
