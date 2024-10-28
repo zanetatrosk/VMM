@@ -4,17 +4,16 @@ import sys
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy
 
 # Input and output paths
 DATASET_PATH = './dog_breed_dataset'
-MODEL_SAVE_PATH = './saved_models/'
-MODEL_SAVE_NAME = '16_dogs_v2'
+MODEL_SAVE_PATH = '../backend/models/'
+MODEL_SAVE_NAME = '16_dogs_test'
 
 # Dataset selection and processing parameters
-SEED = 12356
-IMG_HEIGHT = 240
-IMG_WIDTH = 240
+SEED = 56
+IMG_HEIGHT = 160
+IMG_WIDTH = 160
 VALIDATION_RATIO = 0.2
 
 # Model hyperparameters
@@ -70,7 +69,7 @@ print('Number of training samples:', train_set.samples)
 print('Number of validation samples:', valid_set.samples)
 
 ### Saving the class names to a file ###
-with open(MODEL_SAVE_PATH + MODEL_SAVE_NAME + '_classes.txt', 'w') as f:
+with open(MODEL_SAVE_PATH + MODEL_SAVE_NAME + '_classes.txt', 'x') as f:
     for class_name in class_names:
         f.write(class_name + '\n')
 
@@ -96,10 +95,9 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.MaxPooling2D(),
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dropout(DROPOUT_RATE),
-    tf.keras.layers.Dense(256, activation="relu"),
     tf.keras.layers.Dense(128, activation="relu"),
-    tf.keras.layers.Dropout(DROPOUT_RATE),
     tf.keras.layers.Dense(64, activation="relu"),
+    tf.keras.layers.Dropout(DROPOUT_RATE),
     tf.keras.layers.Dense(32, activation="relu"),
     tf.keras.layers.Dense(n_classes, activation="softmax")
 ])
@@ -119,7 +117,6 @@ reduce_lr_callback = tf.keras.callbacks.ReduceLROnPlateau(
     monitor='val_loss',
     factor=0.5,
     patience=PATIENCE_EPOCHS_REDUCE_LR,
-    cooldown=2,
     min_lr=LEARNING_RATE / 10,
     verbose=1)
 
