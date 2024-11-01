@@ -9,7 +9,6 @@ Téma: Zpracování dat s využitím neuronových sítí
 V rámci projektu byla vytvořena webová aplikace pro klasifikaci psího plemene z fotografie, která využívá konvoluční neuronovou síť implementovanou pomocí frameworku Keras/TensorFlow v jazyce Python. Aplikace pak pro používá backendovou část Python framework Django a pro frontendovou část framework React s jazykem TypeScript. Uživatel tak nahraje fotografii psa a vybere model který chce k rozpoznání využit. Aplikace poté pomocí zvoleného modelu vyhodnotí plemeno, kterému je pes na fotografii vlastnostmi nejpodobnější.
 
 ## Způsob řešení
-
 ### Tvorba datasetu
 
 Prvním krokem pro vytrénovaní funkčního modelu pomocí neuronové sítě je získání dostatečně robustního datasetu, v tomto případě tedy dostatek reprezentativních fotografií psů různých plemen anotovaných správným plemenem.
@@ -20,7 +19,7 @@ Proběhlo tak hledání dalších dat k využití pro trénování, a pro popul�
 
 ### Architektura neuronové sítě
 
-Po konzultaci se cvičícím bylo upřesněno, že by měla být vytrénována vlastní konvoluční neuronová síť bez použití metody transfer learningu s využitím checkpointu jiné neuronové sítě. K samotné klasifikaci byla tak byla vytvořena CNN se standardní architekturou (v souladu s přednáškou) využívající nejprve posloupnost konvolučních vrstev prokládaných max-poolingem, následovaných plně propojenými vrstvami. Jako aktivační funkce byla použita ReLU. Poslední plně propojená vrstva pak počtem neuronů odpovídá počtu tříd, které má model klasifikovat, a využívá aktivační funkci softmax, která vrací pravděpodobnost, že vstupní vzorek patří do jednotlivých tříd. K trénování byl využit optimizační algoritmus Adam a jako loss funkce byla použita SparseCategoricalCrossentropy. 
+Po konzultaci se cvičícím bylo upřesněno, že by měla být vytrénována vlastní konvoluční neuronová síť bez použití metody transfer learningu s využitím checkpointu jiné neuronové sítě. K samotné klasifikaci byla tak byla vytvořena CNN se standardní architekturou využívající nejprve posloupnost konvolučních vrstev s následným max-poolingem, následovaných plně propojenými vrstvami. Jako aktivační funkce byla použita ReLU. Poslední plně propojená vrstva pak počtem neuronů odpovídá počtu tříd, které má model klasifikovat, a využívá aktivační funkci softmax, která vrací pravděpodobnost, že vstupní vzorek patří do jednotlivých tříd. K trénování byl využit optimizační algoritmus Adam a jako loss funkce byla použita SparseCategoricalCrossentropy. 
 
 Ve snaze o potlačení tzv. overfittingu, tedy situaci, kdy se model v trénovacích datech zafixuje na nevhodné vzory a následně se mu nedaří generalizovat na nová data, byly využity techniky augmentace dat a dropout vrstev. Augmentace dat je provedena před samotným trénováním a zahrnuje náhodné překlopení, rotaci a zvětšení vstupních fotografií. Dropout vrstvy pak náhodně vypínají některé neurony v průběhu trénování s cílem zamezit přílišné specializaci jednotlivých neuronů na trénovací data.
 
@@ -47,21 +46,18 @@ Skript je napsán tak, že veškeré konfigurace se provádí nastavením konsta
 
 #### Instalace a spuštění webové aplikace
 
-Pro spuštění backend části webové aplikace je potřeba mít nainstalovaný Python(3.8.10) a doinstalovat framework Django a další potřebné knihovny (Numpy, TensorFlow, Keras, Django REST framework, Pillow). Spuštění backend části aplikace se provede příkazem `python manage.py runserver`.
+Pro spuštění backend části webové aplikace je potřeba mít nainstalovaný Python (3.8.10) a doinstalovat framework Django a další potřebné knihovny (Numpy, TensorFlow, Keras, Django REST framework, Pillow). Spuštění backend části aplikace se provede příkazem `python manage.py runserver`.
 
 Pro spuštění frontend části webové aplikace je potřeba mít nainstalovaný Node.js (18 a vyšší) a doinstalovat React a další potřebné knihovny příkazem `npm install`. Následné spuštění frontend části aplikace se provede příkazem `npm start`. Aplikace bude dostupná na adrese `http://localhost:3000`.
 
-Po spuštění aplikace se objeví formulář, kde má uživatel možnost nahrát obrázek psa a pole s vybráním modelu, který bude použit na rozpoznání plemene. 
-Aplikace nabízí následující modely:
-- 16 breeds model - model, který byl trénován na 16 plemenech psů, má přesnost na cca 50%.
-- TODO
+Po spuštění aplikace se objeví formulář, kde má uživatel možnost nahrát obrázek psa a pole s vybráním modelu, který bude použit na rozpoznání plemene (viz následující sekce).
 
 Po vybrání konkrétního modelu se uživateli zobrazí seznam plemen, které model rozpoznává.
-Po stisknutí tlačítka "Upload" se u6ivateli zobrazí výsledek v podobě tabulky 10 nejpravděpodobnějších plemen psů, které by mohlo být na obrázku seřazených sestupně podle pravděpodobnosti.
+Po stisknutí tlačítka "Upload" se provede predikce pomocí zvoleného modelu a uživateli se zobrazí tabulka s 10 nejpravděpodobnějšími plemeny, ke kterým pes na obrázku patří, seřazenými sestupně podle pravděpodobnosti.
 
 #### Ukázka aplikace
 
-Na obrázku je vidět ukázka webové aplikace, kde byl nahrán obrázek psa a vybrán model 16 breeds model. Aplikace vrátila tabulku s 10 nejpravděpodobnějšími plemeny psů, které by mohlo být na obrázku. Aplikace správně určila, že na obrázku je pes plemene Golden Retriever (i když jen s pravděpodobností 27%).
+Na obrázku je vidět ukázka webové aplikace, kde byl nahrán obrázek psa a vybrán model 16 Breeds Model. Aplikace vrátila tabulku s 10 nejpravděpodobnějšími plemeny psů, které by mohlo být na obrázku. Aplikace správně určila, že na obrázku je pes plemene Golden Retriever (i když jen s pravděpodobností 27 %).
 
 ![Dog Breed Classifier](example.png)
 
