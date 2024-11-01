@@ -79,7 +79,7 @@ Následující parametry a volby byly po pilotní experimentaci (popsáno u kaž
 - Míra učení (LEARNING_RATE a PATIENCE_EPOCHS_REDUCE_LR): 0.002 a 3; určuje, jako mírou se optimizační algoritmus snaží minimalizovat loss funkci (a tedy vylepšovat model). Při vyšší hodnotě se zvyšuje pravděpodobnost skokových zlepšení, ale také stagnace učení. Jelikož byl implementován callback automaticky snižující tuto hodnotu (viz Architektura neuronové sítě), je lepší počátečně volit větší míru, jelikož dojde k jejímu automatickému snížení v případě, kdy se nedaří loss funkci minimalizovat po počet epoch stanovených parametrem patience.
 - Nastavení limitu epoch (MAX_EPOCHS a PATIENCE_EPOCHS_STOP): 10000 a 8; celkový horní limit epoch trénování a počet epoch, po kterém se trénování ukončí, pokud nebylo dosáhnuto zlepšení. Byly voleny vyšší hodnoty, jelikož byl průběh trénování sledován a mohl být tak uživatelsky ukončen, pokud se již zjevně model nezplepšoval.
 
-### Experiment 1: velikost obrázků
+### Podpůrný experiment: velikost obrázků
 
 Fotografie v sestaveném datasetu patrně pochází z mnoha zdrojů a mají tak různé velikosti. Pro trénování CNN je ovšem nutné, aby měly všechny vstupy stejnou velikost, přičemž je typicky volena velikost čtvercová. Otázkou tedy je, na jakou velikost fotografie v datasetu přeškálovat. Větší velikost vstupů umožňuje síti rozpoznat jemnější detaily, ovšem logicky zvětšuje i neuronovou síť a na některé úkoly se ukázaly jako dostačující i menší velikosti vstupů. Jeden z dílčích datasetů již má fotografie náškálované na velikost 224x224 pixelů a další fotografie mají také podobné rozměry, proto škálovat na větší než tuto velikost nedává smysl.
 
@@ -95,7 +95,7 @@ TODO: rm when done, conf should be 16-32-64 conv2d and 128-64 hidden dense layer
 
 Výsledkem bylo rozhodnuto, že se dále bude pracovat s velikostí obrázků 160x160, jelikož se pro tento dataset jeví jako vhodný kompromis mezi kvalitou a velikostí modelu.
 
-### Experiment 2: konfigurace vrstev sítě
+### Konfigurace vrstev sítě
 
 Posledním, ovšem podstatným, krokem v konfiguraci je zvolení samotných vrstev neuronové sítě. Jak již bylo zmíněno výše, projekt se bude držet standardní architektury CNN vykládané na přednášce i používáné v dokumentaci TensorFlow. U konvolučních vrstev bude vždy použita velikost filtru 3x3, která je opět znázorněna na přednášce a nejčastěji používána v praxi v moderních CNN. Stále ovšem zbývá zvolit jak počet konvolučních vrstev, tak plně propojených vrstev kromě poslední klasifikační (nazývaných skryté vrstvy). U nich je dále potřeba volit počet filtrů, resp. počet neuronů, v případě konvoluční, resp. skryté vrstvy. Opět platí, že vyšší hodnoty mohou zvýšit kvalitu neuronové sítě, ovšem zvětšují její velikost.
 
@@ -134,8 +134,20 @@ Dataset 8 plemen (beagle, boxer, golden_retriever, husky, poodle, pug, rottweile
 | 160x160 | 16-32-32 | Do-30-18-12 | 0.470 |  |
 | 160x160 | 32-32-64-64 | Do-64-32 | 0.611 | 8_dogs_v2 |
 
-### 
+Příslušně označené modely byly uloženy a jsou pod danými jmény k dispozici ve výsledné aplikace. Výsledkům tohoto experimentu se věnuje sekce Diskuse.
 
-## Diskuse a závěr
+### Transfer learning
 
-TODO
+TODO když se mi do toho bude chtít
+
+## Diskuse
+
+Z výsledků je relativně dobře patrné, jak přibližně musí být neuronová síť minimálně složitá, aby byla schopná pojmout úkol klasifikace psích plemen pro daný dataset. U jednoduchých sítí z výše testovaných docházelo k zastavení učení po několika epochách, což naznačuje nedostatečnou velikost sítě, a promítlo se na horších výsledcích v desítkách procentních bodů oproti složitější konfiguraci.
+
+Další ladění sítě a získávání konzistentních výsledků se ovšem ukázalo jako velice náročný úkol, jelikož proces trénování jako takový je nedeterministický. I na tomto na relativně malém datasetu se navíc ukázala vysoká náročnost této metody, jelikož i při použití na současné poměry výkonného počítače s herní grafickou kartou trvalo trénování výše uvedených modelů desítky minut. Počet běhů tak musel být omezen na jednotky. Kvůli tomu se tak nepodařilo objasnit ani podobnými konfiguracemi replikovat dosaženou 56 % validační přesnost jednoho modelu pro 16 plemen. Tento konkrétní model se ovšem ukázal při následném testování na dalších obrázcích jako poměrně dobře funkční.
+
+V průběhu učení byl navíc i přes snahu o jeho minimalizaci patrný overfitting zabraňující dalšímu zvýšení validační přesnosti modelů. Pro jeho eliminaci a zlepšení výsledků by tak patrně bylo potřeba dále zvětšovat dataset, což by kromě času na sestavení znamenalo i ještě větší náročnost trénování sítě. Jako vhodná se tak ukázala v tomto "amatérském" prostředí metoda transfer learningu, kde model připravený na širokou škálu dat lze úzce specializovat pro úkol rozpoznání psích plemen i s menším datasetem.
+
+## Závěr
+
+
