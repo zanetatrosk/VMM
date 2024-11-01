@@ -20,7 +20,7 @@ Proběhlo tak hledání dalších dat k využití pro trénování, a pro popul�
 
 ### Architektura neuronové sítě
 
-Po konzultaci se cvičícím bylo upřesněno, že by měla být vytrénována vlastní konvoluční neuronová síť bez použití metody transfer learningu s využitím checkpointu jiné neuronové sítě. K samotné klasifikaci byla tak byla vytvořena CNN se standardní architekturou využívající nejprve posloupnost konvolučních vrstev s následným max-poolingem, následovaných plně propojenými vrstvami. Jako aktivační funkce byla použita ReLU. Poslední plně propojená vrstva pak počtem neuronů odpovídá počtu tříd, které má model klasifikovat, a využívá aktivační funkci softmax, která vrací pravděpodobnost, že vstupní vzorek patří do jednotlivých tříd. K trénování byl využit optimizační algoritmus Adam a jako loss funkce byla použita SparseCategoricalCrossentropy. 
+Po konzultaci se cvičícím bylo upřesněno, že by měla být vytrénována vlastní konvoluční neuronová síť bez použití metody transfer learningu s využitím checkpointu jiné neuronové sítě. K samotné klasifikaci byla tak byla vytvořena CNN se standardní architekturou (v souladu s přednáškou) využívající nejprve posloupnost konvolučních vrstev prokládaných max-poolingem, následovaných plně propojenými vrstvami. Jako aktivační funkce byla použita ReLU. Poslední plně propojená vrstva pak počtem neuronů odpovídá počtu tříd, které má model klasifikovat, a využívá aktivační funkci softmax, která vrací pravděpodobnost, že vstupní vzorek patří do jednotlivých tříd. K trénování byl využit optimizační algoritmus Adam a jako loss funkce byla použita SparseCategoricalCrossentropy. 
 
 Ve snaze o potlačení tzv. overfittingu, tedy situaci, kdy se model v trénovacích datech zafixuje na nevhodné vzory a následně se mu nedaří generalizovat na nová data, byly využity techniky augmentace dat a dropout vrstev. Augmentace dat je provedena před samotným trénováním a zahrnuje náhodné překlopení, rotaci a zvětšení vstupních fotografií. Dropout vrstvy pak náhodně vypínají některé neurony v průběhu trénování s cílem zamezit přílišné specializaci jednotlivých neuronů na trénovací data.
 
@@ -67,35 +67,74 @@ Na obrázku je vidět ukázka webové aplikace, kde byl nahrán obrázek psa a v
 
 ## Experimentace
 
-V následující 
+Výkon neuronové sítě závisí na mnoha parametrech, které je potřeba vhodně zvolit. V rámci projektu bylo postupně provedeno několik experimentů, které se zabývali jejich nastavením a vlivem na výsledky. Těmi je v tomto případě chápána zejména dosažená validační přesnost trénovaného modelu, tedy údaj, jak dobře model přiřazuje vzorkům z validační množiny dat správné označení třídy (tedy plemene psa na obrázku). Sekundárně bude sledována velikost neuronové sítě, která negativně ovlivňuje dobu trénování i velikost výstupního souboru s připraveným modelem.
 
-16 plemen ()
+Kde není popsáno jinak, probíhalo trénování na datasetu 16 plemen psů popsaném v sekci Tvorba datasetu.
 
-| Velikost obrázků | Konvoluční vrstvy (počty filtrů) | Skryté vrstvy (počty neuronů) | Validační přesnost |
+Následující parametry a volby byly po pilotní experimentaci (popsáno u každého parametru) udržovány konstantní, a to s těmito hodnotami:
+
+- Podíl validační množiny datasetu (VALIDATION_RATIO): 0.2; určuje, jaká část datasetu bude vyčleněna do validační množiny, a jaká zbyde pro trénování. Jedná se o obecně doporučenou hodnotu, základní experimentování navíc ukázalo, že drobnější změny (+- 0.05) v rozdělení neměly významný vliv na výsledky, větší změny pak měly tendenci výsledek zhoršovat.
+- Velikost dávky (BATCH_SIZE): 32; určuje, kolik vstupů (obrázků) je v rámci trénování zpracováváno najednou. Opět se jedná o standardní hodnotu, změny hodnoty neprokázaly významný vliv na výsledky.
+- Míra v dropout vrstvě (DROPOUT_RATE): 0.2; určuje, jaký podíl neuronů je deaktivován v rámci dropout vrstev modelu (viz Architektura neuronové sítě). Při použití jedné dropout vrstvy se ukázala tato míra jako rozumná, aby měl dropout měřitelný vliv, ale zároveň nezabraňoval učení neuronové sítě.
+- Míra učení (LEARNING_RATE a PATIENCE_EPOCHS_REDUCE_LR): 0.002 a 3; určuje, jako mírou se optimizační algoritmus snaží minimalizovat loss funkci (a tedy vylepšovat model). Při vyšší hodnotě se zvyšuje pravděpodobnost skokových zlepšení, ale také stagnace učení. Jelikož byl implementován callback automaticky snižující tuto hodnotu (viz Architektura neuronové sítě), je lepší počátečně volit větší míru, jelikož dojde k jejímu automatickému snížení v případě, kdy se nedaří loss funkci minimalizovat po počet epoch stanovených parametrem patience.
+- Nastavení limitu epoch (MAX_EPOCHS a PATIENCE_EPOCHS_STOP): 10000 a 8; celkový horní limit epoch trénování a počet epoch, po kterém se trénování ukončí, pokud nebylo dosáhnuto zlepšení. Byly voleny vyšší hodnoty, jelikož byl průběh trénování sledován a mohl být tak uživatelsky ukončen, pokud se již zjevně model nezplepšoval.
+
+### Experiment 1: velikost obrázků
+
+Fotografie v sestaveném datasetu patrně pochází z mnoha zdrojů a mají tak různé velikosti. Pro trénování CNN je ovšem nutné, aby měly všechny vstupy stejnou velikost, přičemž je typicky volena velikost čtvercová. Otázkou tedy je, na jakou velikost fotografie v datasetu přeškálovat. Větší velikost vstupů umožňuje síti rozpoznat jemnější detaily, ovšem logicky zvětšuje i neuronovou síť a na některé úkoly se ukázaly jako dostačující i menší velikosti vstupů. Jeden z dílčích datasetů již má fotografie náškálované na velikost 224x224 pixelů a další fotografie mají také podobné rozměry, proto škálovat na větší než tuto velikost nedává smysl.
+
+Následující tabulka ukazuje vliv velikosti obrázků na výsledný model. V tomto experimentu byla volena konstantní konfigurace vrstev neuronové sítě, podobná vzorové konfiguraci v dokumentaci TensorFlow pro klasifikaci obrázků {footnote: https://www.tensorflow.org/tutorials/images/classification} (přidána byla další plně propojená vrstva s 64 neurony, jelikož autoři řeší relativně jednodušší úkol -- klasifikaci 5 druhů květin)
+
+TODO: rm when done, conf should be 16-32-64 conv2d and 128-64 hidden dense layers
+
+| Velikost obrázků | Validační přesnost | Velikost modelu | 
 |---|---|---|---|
-| 224x224 | 64-128-256 | Do-64 | 0.439 |
-| 224x224 | 64-128-256 | Do-64-32 | 0.438 |
-| 224x224 | 64-128-256 | Do-128-64-32 | 0.412 |
-| 224x224 | 64-128-256 | Do-128-64-Do-32 | 0.423 | <- saved magicky vytvořený model s 0.56 přesností (velikost 160x160)
+| 64x64 | 0.xxx | x MiB |
+| 160x160 | 0.xxx | x MiB |
+| 224x224 | 0.xxx | x MiB |
+
+Výsledkem bylo rozhodnuto, že se dále bude pracovat s velikostí obrázků 160x160, jelikož se pro tento dataset jeví jako vhodný kompromis mezi kvalitou a velikostí modelu.
+
+### Experiment 2: konfigurace vrstev sítě
+
+Posledním, ovšem podstatným, krokem v konfiguraci je zvolení samotných vrstev neuronové sítě. Jak již bylo zmíněno výše, projekt se bude držet standardní architektury CNN vykládané na přednášce i používáné v dokumentaci TensorFlow. U konvolučních vrstev bude vždy použita velikost filtru 3x3, která je opět znázorněna na přednášce a nejčastěji používána v praxi v moderních CNN. Stále ovšem zbývá zvolit jak počet konvolučních vrstev, tak plně propojených vrstev kromě poslední klasifikační (nazývaných skryté vrstvy). U nich je dále potřeba volit počet filtrů, resp. počet neuronů, v případě konvoluční, resp. skryté vrstvy. Opět platí, že vyšší hodnoty mohou zvýšit kvalitu neuronové sítě, ovšem zvětšují její velikost.
+
+Tento experiment byl kromě celého datasetu proveden také na redukované sadě, která obsahuje pouze polovinu plemen. Následující tabulky znázorňují výsledky experimentu (zkratka Do v popisu skrytých vrstev značí zařazení dropout vrstvy):
+
+Dataset 16 plemen (TODO vypsat plemena):
+
+TODO předělat na nějakých 3-4 pokusech, kde to bude aspoň trochu vypadat hezky, vypíšu tam i ten magic model, prostě to tak vyšlo
+
+| Velikost obrázků | Konvoluční vrstvy (počty filtrů) | Skryté vrstvy (počty neuronů) | Validační přesnost | Uloženo jako |
+|---|---|---|---|
+| 224x224 | 64-128-256 | Do-64 | 0.439 |  |
+| 224x224 | 64-128-256 | Do-64-32 | 0.438 |  |
+| 224x224 | 64-128-256 | Do-128-64-32 | 0.412 |  |
+| 224x224 | 64-128-256 | Do-128-64-Do-32 | 0.423 | <- saved magicky vytvořený model s 0.56 přesností (velikost 160x160) |
 | 224x224 | 64-128-256 | Do-256-128-Do-64-32 | 0.381 |
 | 224x224 | 64-128-256 | Do-512-256-Do-128-64-32 | 0.436 |
 
-| 160x160 | 
-
 | 224x224 | 16-32-64 | Do-64-32 | 0.435 |
 
-8 plemen (beagle, boxer, golden_retriever, husky, poodle, pug, rottweiler, yorkshire_terrier)
+| 160x160 | 16-32-32 | Do-32 | 0.xxx |  |
+| 160x160 | 16-32-32-64 | Do-64-32 | 0.xxx |  |
+| 160x160 | 64-128-256 | Do-128-64-Do-32 | 0.561 | 16_dogs_v1 |
+...
 
-| Velikost obrázků | Konvoluční vrstvy (počty filtrů) | Skryté vrstvy (počty neuronů) | Validační přesnost |
+Dataset 8 plemen (beagle, boxer, golden_retriever, husky, poodle, pug, rottweiler, yorkshire_terrier):
+
+| Velikost obrázků | Konvoluční vrstvy (počty filtrů) | Skryté vrstvy (počty neuronů) | Validační přesnost | Uloženo jako |
 |---|---|---|---|
-| 160x160 | 16-32-32 | Do-32 | 0.565 |
-| 160x160 | 16-32-32 | Do-64-32 | 0.576 | <- saved
-| 160x160 | 32-64-128 | Do-64-32 | 0.580 |
-| 160x160 | 16-32-32 | Do-128-96 | 0.550 |
-| 160x160 | 16-32-32 | Do-16 | 0.395 |
-| 224x224 | 16-32-32 | Do-64-32 | 0.567 |
-| 160x160 | 16-32-32 | Do-30-18-12 | 0.470 |
-| 160x160 | 32-32-64-64 | Do-64-32 | 0.611 | <- saved as v2
+| 160x160 | 16-32-32 | Do-32 | 0.565 |  |
+| 160x160 | 16-32-32 | Do-64-32 | 0.576 | 8_dogs_v1 |
+| 160x160 | 32-64-128 | Do-64-32 | 0.580 |  |
+| 160x160 | 16-32-32 | Do-128-96 | 0.550 |  |
+| 160x160 | 16-32-32 | Do-16 | 0.395 |  |
+| 224x224 | 16-32-32 | Do-64-32 | 0.567 |  |
+| 160x160 | 16-32-32 | Do-30-18-12 | 0.470 |  |
+| 160x160 | 32-32-64-64 | Do-64-32 | 0.611 | 8_dogs_v2 |
+
+### 
 
 ## Diskuse a závěr
 
