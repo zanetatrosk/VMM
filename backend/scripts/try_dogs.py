@@ -9,15 +9,19 @@ IMG_WIDTH = 160
 
 
 
-CLASSNAMES_PATH = './models/16_dogs_v1_classes.txt'
-MODEL_PATH = './models/16_dogs_v1.keras'
+CLASSNAMES_PATH_16_DOGS = './models/16_dogs_v1_classes.txt'
+CLASSNAMES_PATH_8_DOGS = './models/8_dogs_v2_classes.txt'
+MODEL_PATH_16_DOGS = './models/16_dogs_v1.keras'
+MODEL_PATH_8_DOGS = './models/8_dogs_v2.keras'
 IMAGE_PATH = 'tmp.jpg'
 
 def getPictureRecognition(imgInput: Image, pickedModel: str):
-    if pickedModel == 'dog':
-        model_path = MODEL_PATH
-    elif pickedModel == 'cat':
-        model_path = 'models/cats_model'
+    if pickedModel == '16_dogs':
+        model_path = MODEL_PATH_16_DOGS
+        class_name_path = CLASSNAMES_PATH_16_DOGS
+    elif pickedModel == '8_dogs':
+        model_path = MODEL_PATH_8_DOGS
+        class_name_path = CLASSNAMES_PATH_8_DOGS
     else:
         return 'Invalid model'
         
@@ -27,7 +31,7 @@ def getPictureRecognition(imgInput: Image, pickedModel: str):
     # load image into file
     imgInput.save(IMAGE_PATH)
     
-    classnames = open(os.path.expanduser(CLASSNAMES_PATH)).read().splitlines()
+    classnames = open(os.path.expanduser(class_name_path)).read().splitlines()
     print(classnames)
     
     image = tf.keras.preprocessing.image.load_img(
@@ -44,8 +48,7 @@ def getPictureRecognition(imgInput: Image, pickedModel: str):
         tf.expand_dims(tf.keras.preprocessing.image.img_to_array(image), 0)
     )
 
-    model_path = os.path.expanduser(MODEL_PATH)
-    model = tf.keras.models.load_model(model_path)
+    model = tf.keras.models.load_model(os.path.expanduser(model_path))
     predictions = model.predict(image_batch)
 
     top_10_indices = np.argsort(predictions[0])[-10:][::-1]
