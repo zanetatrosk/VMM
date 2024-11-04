@@ -6,7 +6,7 @@ Téma: Zpracování dat s využitím neuronových sítí
 
 ## Popis projektu
 
-V rámci projektu byla vytvořena webová aplikace pro klasifikaci psího plemene z fotografie, která využívá konvoluční neuronovou síť implementovanou pomocí frameworku Keras/TensorFlow v jazyce Python. Aplikace pak pro používá backendovou část Python framework Django a pro frontendovou část framework React s jazykem TypeScript. Uživatel tak nahraje fotografii psa a vybere model který chce k rozpoznání využit. Aplikace poté pomocí zvoleného modelu vyhodnotí plemeno, kterému je pes na fotografii vlastnostmi nejpodobnější.
+V rámci projektu byla vytvořena webová aplikace pro klasifikaci psího plemene z fotografie, která využívá konvoluční neuronovou síť (Convolutional Neural Network - CNN) implementovanou pomocí frameworku Keras/TensorFlow v jazyce Python. Aplikace pak pro používá backendovou část Python framework Django a pro frontendovou část framework React s jazykem TypeScript. Uživatel tak nahraje fotografii psa a vybere model který chce k rozpoznání využit. Aplikace poté pomocí zvoleného modelu vyhodnotí plemeno, kterému je pes na fotografii vlastnostmi nejpodobnější.
 
 ## Způsob řešení
 ### Tvorba datasetu
@@ -81,15 +81,13 @@ Fotografie v sestaveném datasetu patrně pochází z mnoha zdrojů a mají tak 
 
 Následující tabulka ukazuje vliv velikosti obrázků na výsledný model. V tomto experimentu byla volena konstantní konfigurace vrstev neuronové sítě, podobná vzorové konfiguraci v dokumentaci TensorFlow pro klasifikaci obrázků {footnote: https://www.tensorflow.org/tutorials/images/classification} (přidána byla další plně propojená vrstva s 64 neurony, jelikož autoři řeší relativně jednodušší úkol -- klasifikaci 5 druhů květin)
 
-TODO: rm when done, conf should be 16-32-64 conv2d and 128-64 hidden dense layers
+| Velikost obrázků | Validační přesnost | Velikost modelu | Délka epochy trénování |
+|---|--:|--:|--:|
+| 64x64 | 0.382 | 6.43 MiB | ~ 22 s |
+| 160x160 | 0.399 | 37.9 MiB | ~ 32 s |
+| 224x224 | 0.417 | 73.9 MiB | ~ 45 s |
 
-| Velikost obrázků | Validační přesnost | Velikost modelu | 
-|---|---|---|---|
-| 64x64 | 0.xxx | x MiB |
-| 160x160 | 0.xxx | x MiB |
-| 224x224 | 0.xxx | x MiB |
-
-Výsledkem bylo rozhodnuto, že se dále bude pracovat s velikostí obrázků 160x160, jelikož se pro tento dataset jeví jako vhodný kompromis mezi kvalitou a velikostí modelu.
+Výsledkem bylo rozhodnuto, že se dále bude pracovat s velikostí obrázků 160x160, jelikož se pro tento dataset jeví jako vhodný kompromis mezi kvalitou a velikostí modelu. TODO
 
 ### Konfigurace vrstev sítě
 
@@ -97,38 +95,35 @@ Posledním, ovšem podstatným, krokem v konfiguraci je zvolení samotných vrst
 
 Tento experiment byl kromě celého datasetu proveden také na redukované sadě, která obsahuje pouze polovinu plemen. Následující tabulky znázorňují výsledky experimentu (zkratka Do v popisu skrytých vrstev značí zařazení dropout vrstvy):
 
-Dataset 16 plemen (TODO vypsat plemena):
-
-TODO předělat na nějakých 3-4 pokusech, kde to bude aspoň trochu vypadat hezky, vypíšu tam i ten magic model, prostě to tak vyšlo
+Dataset 16 plemen (beagle, boxer, bulldog, chihuahua, corgi, dachshund, german_shepherd, golden_retriever, husky, labrador, pomeranian, poodle, pug, rottweiler, shiba_inu, yorkshire_terrier):
 
 | Velikost obrázků | Konvoluční vrstvy (počty filtrů) | Skryté vrstvy (počty neuronů) | Validační přesnost | Uloženo jako |
-|---|---|---|---|
-| 224x224 | 64-128-256 | Do-64 | 0.439 |  |
-| 224x224 | 64-128-256 | Do-64-32 | 0.438 |  |
-| 224x224 | 64-128-256 | Do-128-64-32 | 0.412 |  |
-| 224x224 | 64-128-256 | Do-128-64-Do-32 | 0.423 | <- saved magicky vytvořený model s 0.56 přesností (velikost 160x160) |
-| 224x224 | 64-128-256 | Do-256-128-Do-64-32 | 0.381 |
-| 224x224 | 64-128-256 | Do-512-256-Do-128-64-32 | 0.436 |
-
-| 224x224 | 16-32-64 | Do-64-32 | 0.435 |
-
-| 160x160 | 16-32-32 | Do-32 | 0.xxx |  |
-| 160x160 | 16-32-32-64 | Do-64-32 | 0.xxx |  |
+|--|--|--|--:|---|
+| 160x160 | 16-32-32 | Do-32 | 0.337 |  |
+| 160x160 | 16-32-64 | Do-128-64 | 0.399 |  |
+| 160x160 | 16-32-32-64 | Do-64-32 | 0.422 |  |
+| 160x160 | 16-32-32-64-64 | Do-64-32 | 0.088 |  |
+| 160x160 | 16-32-32-64 | Do-128-64-Do-32 | 0.440 |  |
+| 160x160 | 32-64-64-128 | Do-128-64-Do-32 | 0.502 |  |
+| 160x160 | 32-64-64-128 | Do-64-32 | 0.448 |  |
+| 160x160 | 64-128-128-256 | Do-128-64-Do-32 | 0.450 |  |
 | 160x160 | 64-128-256 | Do-128-64-Do-32 | 0.561 | 16_dogs_v1 |
-...
+| 160x160 | 64-128-256 | Do-128-96-64-Do-32 | 0.401 |  |
 
 Dataset 8 plemen (beagle, boxer, golden_retriever, husky, poodle, pug, rottweiler, yorkshire_terrier):
 
 | Velikost obrázků | Konvoluční vrstvy (počty filtrů) | Skryté vrstvy (počty neuronů) | Validační přesnost | Uloženo jako |
-|---|---|---|---|
+|--|--|--|--:|---|
 | 160x160 | 16-32-32 | Do-32 | 0.565 |  |
-| 160x160 | 16-32-32 | Do-64-32 | 0.576 | 8_dogs_v1 |
+| 160x160 | 16-32-32 | Do-64-32 | 0.576 |  |
 | 160x160 | 32-64-128 | Do-64-32 | 0.580 |  |
 | 160x160 | 16-32-32 | Do-128-96 | 0.550 |  |
 | 160x160 | 16-32-32 | Do-16 | 0.395 |  |
 | 224x224 | 16-32-32 | Do-64-32 | 0.567 |  |
 | 160x160 | 16-32-32 | Do-30-18-12 | 0.470 |  |
-| 160x160 | 32-32-64-64 | Do-64-32 | 0.611 | 8_dogs_v2 |
+| 160x160 | 32-32-64-64 | Do-64-32 | 0.611 |  |
+| 160x160 | 64-128-128-256 | Do-64-32 | 0.622 | 8_dogs_v3 |
+| 160x160 | 64-128-128-256 | Do-128-64-Do-32 | 0.543 |  |
 
 Příslušně označené modely byly uloženy a jsou pod danými jmény k dispozici ve výsledné aplikace. Výsledkům tohoto experimentu se věnuje sekce Diskuse.
 
