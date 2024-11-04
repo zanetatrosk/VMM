@@ -129,7 +129,14 @@ Příslušně označené modely byly uloženy a jsou pod danými jmény k dispoz
 
 ### Transfer learning
 
-TODO když se mi do toho bude chtít
+V rámci experimentace bylo také provedeno trénování modelu pomocí metody transfer learningu. Jako základ byl použit model předtrénovaný MobileNetV2 na datasetu ImageNet. 
+
+Modelu byly přidány navíc nové vrstvy:
+- (Dense) skrytá vrstva se 128 neurony a aktivační funkcí ReLU
+- Klasifikační vrstva s počtem neuronů odpovídajícím počtu tříd (n_classes)
+Nově vzniklému modelu bylo vypnuto trénování všech vrstev pocházející z MobileNetV2, tedy byly trénovány pouze nově přidané vrstvy.
+
+Výsledný model byl následně trénován na datasetu 16 plemen psů. Jeho výsledná validační přesnost činila 0.899.
 
 ## Diskuse
 
