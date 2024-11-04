@@ -10,10 +10,10 @@ IMG_WIDTH = 160
 
 
 CLASSNAMES_PATH_16_DOGS = './models/16_dogs_v1_classes.txt'
-CLASSNAMES_PATH_8_DOGS = './models/8_dogs_v2_classes.txt'
+CLASSNAMES_PATH_8_DOGS = './models/8_dogs_v3_classes.txt'
 CLASSNAMES_PATH_PRETRAINED = './models/transfer_learning_dog_breeds_classes.txt'
 MODEL_PATH_16_DOGS = './models/16_dogs_v1.keras'
-MODEL_PATH_8_DOGS = './models/8_dogs_v2.keras'
+MODEL_PATH_8_DOGS = './models/8_dogs_v3.keras'
 MODEL_PATH_PRETRAINED = './models/transfer_learning_dog_breeds.keras'
 IMAGE_PATH = 'tmp.jpg'
 

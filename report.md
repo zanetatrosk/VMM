@@ -148,4 +148,7 @@ V průběhu učení byl navíc i přes snahu o jeho minimalizaci patrný overfit
 
 ## Závěr
 
+V rámci projektu byla vyvinuta webová aplikace pro klasifikaci psích plemen z obrázků pomocí neuronových sítí. Byly vytrénovány dva modely od základu (jeden pro 8 plemen a druhý pro 16 plemen). Dále byl vytrénován jeden model pomocí metody transfer learningu rozpoznávající 16 plemen. Modely trénované od základu dosáhly nejvyšší validační přesnosti 0.622 (pro 8 plemen) a 0.561 (pro 16 plemen). Model trénovaný pomocí transfer learningu dosáhl výrazně vyšší validační přesnosti, konkrétně 0.899.
+
+Výsledky ukazují, že metoda transfer learningu je výrazně efektivnější pro dosažení vyšší přesnosti klasifikace, zejména při práci s menšími datasetem. Modely trénované od základu vykazují nižší přesnost, což naznačuje, že pro dosažení lepších výsledků by bylo potřeba větší množství trénovacích dat nebo složitější architektura sítě. 
 
