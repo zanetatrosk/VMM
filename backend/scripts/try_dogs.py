@@ -11,8 +11,10 @@ IMG_WIDTH = 160
 
 CLASSNAMES_PATH_16_DOGS = './models/16_dogs_v1_classes.txt'
 CLASSNAMES_PATH_8_DOGS = './models/8_dogs_v2_classes.txt'
+CLASSNAMES_PATH_PRETRAINED = './models/transfer_learning_dog_breeds_classes.txt'
 MODEL_PATH_16_DOGS = './models/16_dogs_v1.keras'
 MODEL_PATH_8_DOGS = './models/8_dogs_v2.keras'
+MODEL_PATH_PRETRAINED = './models/transfer_learning_dog_breeds.keras'
 IMAGE_PATH = 'tmp.jpg'
 
 def getPictureRecognition(imgInput: Image, pickedModel: str):
@@ -22,6 +24,9 @@ def getPictureRecognition(imgInput: Image, pickedModel: str):
     elif pickedModel == '8_dogs':
         model_path = MODEL_PATH_8_DOGS
         class_name_path = CLASSNAMES_PATH_8_DOGS
+    elif pickedModel == 'pretrained':
+        model_path = MODEL_PATH_PRETRAINED
+        class_name_path = CLASSNAMES_PATH_PRETRAINED
     else:
         return 'Invalid model'
         

@@ -44,6 +44,28 @@ const models: Model[] = [
             'rottweiler',
             'yorkshire_terrier'
         ]    
+    },
+    {
+        label: 'pretrained model',
+        value: 'pretrained',
+        breeds: [
+            'beagle',
+            'boxer',
+            'bulldog',
+            'chihuahua',
+            'corgi',
+            'dachshund',
+            'german_shepherd',
+            'golden_retriever',
+            'husky',
+            'labrador',
+            'pomeranian',
+            'poodle',
+            'pug',
+            'rottweiler',
+            'shiba_inu',
+            'yorkshire_terrier'
+        ]
     }
 ];
 
