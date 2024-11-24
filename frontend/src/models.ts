@@ -46,7 +46,7 @@ const models: Model[] = [
         ]    
     },
     {
-        label: 'pretrained model',
+        label: 'transfer learning model',
         value: 'pretrained',
         breeds: [
             'beagle',
