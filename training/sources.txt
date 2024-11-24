@@ -2,3 +2,6 @@ https://www.kaggle.com/datasets/aseemdandgaval/23-pet-breeds-image-classificatio
 https://www.kaggle.com/datasets/tanlikesmath/the-oxfordiiit-pet-dataset
 https://www.kaggle.com/datasets/gpiosenka/70-dog-breedsimage-data-set
 https://www.kaggle.com/datasets/jessicali9530/stanford-dogs-dataset
+
+Download link the dataset:
+https://campuscvut-my.sharepoint.com/:u:/g/personal/cihakfil_cvut_cz/EZRtFpS_h-1PirrUo5EdposBLQx-prr_gxdOeTZw3gdw1A?e=7Ld4Hi
